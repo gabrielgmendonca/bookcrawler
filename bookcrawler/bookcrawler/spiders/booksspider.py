@@ -8,17 +8,20 @@ class BooksSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        book_links = response.css('blockquote p a')
+        book_links = response.css('blockquote p a[href*="Livros"]')
         yield from response.follow_all(book_links, self.parse_book)
 
     def parse_book(self, response):
-        chapter_links = response.css('blockquote p a')
+        chapter_links = response.css('blockquote p a:not([href*="Tematica"])')
         yield from response.follow_all(chapter_links, self.parse_chapter)
 
     def parse_chapter(self, response):
-        heading = response.css('h1 i::text').get().strip().split('—')
+        heading = response.css('h1 i::text').get('').strip().split('—')
         book_title = heading[0].strip()
-        book_author = heading[1].strip()
+        book_author = ''
+        if len(heading) > 1:
+            book_author = heading[1].strip()
+
         book_medium = 'Chico Xavier'
         chapter_number = response.css('h4::text').get('').strip()
         chapter_name = response.css('h2::text').get('').strip()
@@ -38,7 +41,7 @@ class BooksSpider(scrapy.Spider):
                 .replace('.', '')
                 .strip()
             )
-            chapter_epigraph_ref = epigraph.css('a::text').get()
+            chapter_epigraph_ref = epigraph.css('a::text').get('')
 
         chapter_text = (
             response
