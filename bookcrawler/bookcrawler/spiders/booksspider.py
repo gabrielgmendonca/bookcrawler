@@ -43,7 +43,7 @@ class BooksSpider(scrapy.Spider):
         chapter_text = (
             response
             .css('blockquote')
-            .css('p:not([class="BT"]):not([class="Sgn"]):not([class="FnT"])::text')
+            .css('p:not([class="BT"]):not([class="Sgn"]):not([class="FnT"])::text, p:not([class="BT"]):not([class="Sgn"]):not([class="FnT"]) a::text')
             .getall()
         )
         chapter_text = '\n'.join(
