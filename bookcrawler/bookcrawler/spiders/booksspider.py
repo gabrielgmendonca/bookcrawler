@@ -52,6 +52,7 @@ class BooksSpider(scrapy.Spider):
         chapter_text = '\n'.join(
             [self._remove_extra_spaces(p.strip()) for p in chapter_text]
         )
+        chapter_url = response.url
         return {
             'book_title': self._remove_extra_spaces(book_title),
             'book_author': self._remove_extra_spaces(book_author),
@@ -62,6 +63,7 @@ class BooksSpider(scrapy.Spider):
             'chapter_epigraph_author': chapter_epigraph_author,
             'chapter_epigraph_ref': chapter_epigraph_ref,
             'chapter_text': chapter_text,
+            'chapter_url': chapter_url,
         }
 
     def _remove_extra_spaces(self, s):
