@@ -49,22 +49,22 @@ class BooksSpider(scrapy.Spider):
             .css('p:not([class="BT"]):not([class="Sgn"]):not([class="FnT"])::text, p:not([class="BT"]):not([class="Sgn"]):not([class="FnT"]) a::text')
             .getall()
         )
-        chapter_text = '\n'.join(
-            [self._remove_extra_spaces(p.strip()) for p in chapter_text]
-        )
         chapter_url = response.url
-        return {
-            'book_title': self._remove_extra_spaces(book_title),
-            'book_author': self._remove_extra_spaces(book_author),
-            'book_medium': book_medium,
-            'chapter_number': chapter_number,
-            'chapter_name': chapter_name,
-            'chapter_epigraph_text': chapter_epigraph_text,
-            'chapter_epigraph_author': chapter_epigraph_author,
-            'chapter_epigraph_ref': chapter_epigraph_ref,
-            'chapter_text': chapter_text,
-            'chapter_url': chapter_url,
-        }
+
+        for i, paragraph in enumerate(chapter_text):
+            yield {
+                'book_title': self._remove_extra_spaces(book_title),
+                'book_author': self._remove_extra_spaces(book_author),
+                'book_medium': book_medium,
+                'chapter_number': chapter_number,
+                'chapter_name': chapter_name,
+                'chapter_epigraph_text': chapter_epigraph_text,
+                'chapter_epigraph_author': chapter_epigraph_author,
+                'chapter_epigraph_ref': chapter_epigraph_ref,
+                'chapter_url': chapter_url,
+                'paragraph_index': i,
+                'paragraph_text': self._remove_extra_spaces(paragraph.strip()),
+            }
 
     def _remove_extra_spaces(self, s):
         return ' '.join(s.split())
