@@ -43,16 +43,20 @@ class BooksSpider(scrapy.Spider):
             )
             chapter_epigraph_ref = epigraph.css('a::text').get('')
 
-        chapter_text = (
+        paragraphs = (
             response
             .css('blockquote')
             .css('p:not([class="BT"]):not([class="Sgn"]):not([class="FnT"])')
-            .xpath('.//text()')
-            .getall()
         )
         chapter_url = response.url
 
-        for i, paragraph in enumerate(chapter_text):
+        i = 0
+        for p in paragraphs:
+            text = self._remove_extra_spaces(
+                ''.join(p.xpath('.//text()').getall()).strip()
+            )
+            if not text:
+                continue
             yield {
                 'book_title': self._remove_extra_spaces(book_title),
                 'book_author': self._remove_extra_spaces(book_author),
@@ -64,8 +68,9 @@ class BooksSpider(scrapy.Spider):
                 'chapter_epigraph_ref': chapter_epigraph_ref,
                 'chapter_url': chapter_url,
                 'paragraph_index': i,
-                'paragraph_text': self._remove_extra_spaces(paragraph.strip()),
+                'paragraph_text': text,
             }
+            i += 1
 
     def _remove_extra_spaces(self, s):
         return ' '.join(s.split())
